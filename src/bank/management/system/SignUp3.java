@@ -11,15 +11,21 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
 
-public class SignUp3 extends JFrame{
+public class SignUp3 extends JFrame implements ActionListener{
     JRadioButton r1,r2,r3,r4;
     JTextField cardno;
     JCheckBox c1,c2,c3,c4,c5,c6;
     JButton s,c;
-    SignUp3(){
+    String formno;
+    SignUp3(String formno){
 
         ImageIcon i1= new ImageIcon(ClassLoader.getSystemResource("icon/bank.png"));
         Image i2 = i1.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
@@ -161,7 +167,7 @@ public class SignUp3 extends JFrame{
         add(c7);
 
         JLabel l12 = new JLabel("Form No:");
-        l12.setFont(new Font("Raleway",Font.BOLD,14));
+        l12.setFont(new Font("Raleway",Font.BOLD,12));
         l12.setBounds(700,10,100,30);
         add(l12);
 
@@ -175,6 +181,7 @@ public class SignUp3 extends JFrame{
         s.setBackground(Color.BLACK);
         s.setForeground(Color.WHITE);
         s.setBounds(250,720,100,30);
+        s.addActionListener(this);
         add(s);
 
         c = new JButton("Cancel");
@@ -182,23 +189,8 @@ public class SignUp3 extends JFrame{
         c.setBackground(Color.BLACK);
         c.setForeground(Color.WHITE);
         c.setBounds(420,720,100,30);
+        c.addActionListener(this);
         add(c);
-
-         
-
-
-
-        // //car no. textfeild
-        // JTextField cardno =new JTextField();
-        // cardno.setFont(new Font("Raleway",Font.BOLD,18));
-        // cardno.setBounds()
-
-    
-
-        
-        
-
-
 
         getContentPane().setBackground(new Color(215,252,252));
         setSize(850,800);
@@ -207,8 +199,66 @@ public class SignUp3 extends JFrame{
         setVisible(true);
 
     }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String atype =null;
+        if(r1.isSelected()){
+            atype = "Saving Account";
+        }else if(r2.isSelected()){
+            atype = "Fixed Deposite Account";
+        }
+        else if(r3.isSelected()) {
+            atype="Current Account";
+        }else if(r4.isSelected()){
+            atype = "Recurring Deposite Account";
+        }
+        Random ran = new Random();
+        long first7 =(ran.nextLong()% 90000000L)+1409963000000000L;
+        String cardno = " "+Math.abs(first7);
+        
+        long first3 =(ran.nextLong()%9000L)+1000L;
+        String pin = ""+ Math.abs(first3);
+
+        String fac = "";
+        if(c1.isSelected()){
+            fac ="ATM CARD";
+        }else if(c2.isSelected()){
+            fac ="Internet Banking";
+        }else if(c3.isSelected()){
+            fac= "Mobile Banking";
+        }else if(c4.isSelected()){
+            fac= "Email Alerts";
+        }else if (c5.isSelected()){
+            fac = "Cheque Book";
+        }else if(c6.isSelected()){
+            fac= "E-Statement";
+        }
+
+        try {
+            if(e.getSource()==s){
+                if(atype.equals("")){
+                    JOptionPane.showMessageDialog(null,"fill the details");
+                }else {
+                    Conn c2= new Conn();
+                    String q ="insert into signupthree values('"+formno+"','"+atype+"','"+cardno+"','"+pin+"','"+fac+"')";
+                    String q2="insert into login values ('"+formno+"','"+cardno+"','"+pin+"')";
+                    c2.statement.executeUpdate(q);
+                    c2.statement.executeUpdate(q2);
+                    JOptionPane.showMessageDialog(null,"Card No: "+cardno+"\n pin: "+pin);
+                    new Deposite(pin);
+                    setVisible(false);
+                }
+            }else if(e.getSource()==c){
+                System.exit(0);
+            }
+            
+        } catch (Exception E) {
+            
+        }
+    }
+    
     public static void main(String[] args) {
-        new SignUp3();
+        new SignUp3("");
     }
     
 }

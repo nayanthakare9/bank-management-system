@@ -1,10 +1,12 @@
 package bank.management.system;
 
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import java.awt.*;
@@ -18,7 +20,7 @@ public class SignUp2 extends JFrame implements ActionListener{
    JRadioButton r1,r2,e1,e2;
    JButton Next;
 
-    SignUp2(String first){
+    SignUp2(String formno){
       super ("APPLICATION FORM");
       //bank iamge icon
       ImageIcon i1= new ImageIcon(ClassLoader.getSystemResource("icon/bank.png"));
@@ -113,7 +115,7 @@ public class SignUp2 extends JFrame implements ActionListener{
      add(l8);
 
      //textfeild for pan no.
-     JTextField textpan = new JTextField();
+     textpan = new JTextField();
      textpan.setFont(new Font("Raleway",Font.BOLD,18));
      textpan.setBounds(350,370,320,30);
      add(textpan);
@@ -125,7 +127,7 @@ public class SignUp2 extends JFrame implements ActionListener{
      add(l9);
 
      //textfeild for addhar no.
-     JTextField textaddhar = new JTextField();
+     textaddhar = new JTextField();
      textaddhar.setFont(new Font("Raleway",Font.BOLD,18));
      textaddhar.setBounds(350,420,320,30);
      add(textaddhar);
@@ -151,6 +153,10 @@ public class SignUp2 extends JFrame implements ActionListener{
      r2.setBounds(460,470,100,30);
      add(r2);
 
+     ButtonGroup yn = new ButtonGroup();
+     yn.add(r1);
+     yn.add(r2);
+
      //add details --> existing account 
      JLabel l11 = new JLabel("Existing Account:");
      l11.setFont(new Font("Raleway",Font.BOLD,22));
@@ -172,13 +178,17 @@ public class SignUp2 extends JFrame implements ActionListener{
      e2.setBounds(460,520,100,30);
      add(e2);
 
+     ButtonGroup yn2 = new ButtonGroup();
+     yn2.add(e1);
+     yn2.add(e2);
+
      //add details --> form no
      JLabel l12 = new JLabel("Form No:");
      l12.setFont(new Font("Raleway",Font.BOLD,18));
-     l12.setBounds(700,10,100,30);
+     l12.setBounds(690,10,100,30);
      add(l12);
      JLabel l13 = new JLabel(formno);
-     l13.setFont(new Font("Raleway",Font.BOLD,18));
+     l13.setFont(new Font("Raleway",Font.BOLD,12));
      l13.setBounds(760,10,100,30);
      add(l13);
 
@@ -200,7 +210,43 @@ public class SignUp2 extends JFrame implements ActionListener{
     } 
     @Override
     public void actionPerformed(ActionEvent e) {
-        
+        String rel = (String)comboBox.getSelectedItem();
+        String cate =(String)comboBox2.getSelectedItem();
+        String inc = (String)comboBox3.getSelectedItem();
+        String edu = (String)comboBox4.getSelectedItem();
+        String occ = (String)comboBox5.getSelectedItem();
+
+        String addhar = textaddhar.getText();
+        String pan = textpan.getText();
+
+        String scitizen = "";
+        if(r1.isSelected()){
+         scitizen = "Yes";
+        }else if (r2.isSelected()){
+         scitizen="No";
+        }
+
+        String existacc = "";
+        if(e1.isSelected()){
+         existacc = "Yes";
+        }else if (e2.isSelected()){
+         existacc="No";
+        }
+
+        try {
+         if(textaddhar.getText().equals("")||textpan.getText().equals("")){
+            JOptionPane.showMessageDialog(null,"enter the above details carefully");
+         }else{
+            Conn c1 = new Conn();
+            String q = "insert into signuptwo values('"+formno+"','"+rel+"','"+cate+"','"+inc+"','"+edu+"','"+occ+"','"+addhar+"','"+pan+"','"+scitizen+"','"+existacc+"')";
+            c1.statement.executeUpdate(q);
+            new SignUp3(formno);
+            setVisible(false);
+         }
+         
+        } catch (Exception E) {
+         E.printStackTrace();
+        }
     }
     
 
