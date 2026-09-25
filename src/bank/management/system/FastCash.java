@@ -4,12 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.util.Date;
 
-public class mainClass extends JFrame implements ActionListener{
+public class FastCash extends JFrame implements ActionListener {
     JButton b1,b2,b3,b4,b5,b6,b7;
     String pin;
-    mainClass(String pin){
-        
+    FastCash(String pin){
         ImageIcon i1= new ImageIcon(ClassLoader.getSystemResource("icon/atm2.png"));
         Image i2 = i1.getImage().getScaledInstance(1550, 830, Image.SCALE_DEFAULT);
         ImageIcon i3 = new ImageIcon(i2);
@@ -17,55 +18,55 @@ public class mainClass extends JFrame implements ActionListener{
         l3.setBounds(0,0,1550,830);
         add(l3);
 
-        JLabel label= new JLabel("Please Select Your Transaction");
+        JLabel label= new JLabel("SELECT WITHDRAWL AMOUNT");
         label.setBounds(430,180,700,35);
-        label.setFont(new Font("System",Font.BOLD,28));
+        label.setFont(new Font("System",Font.BOLD,22));
         label.setForeground(Color.WHITE);
         l3.add(label);
 
-        b1 = new JButton("DEPOSITE");
+        b1 = new JButton("Rs. 100");
         b1.setBackground(new Color(65,125,128));
         b1.setForeground(Color.WHITE);
         b1.setBounds(405,274,150,35);
         b1.addActionListener(this);
         l3.add(b1);
 
-        b2 = new JButton("CASH WITHDRAWL");
+        b2 = new JButton("Rs. 500");
         b2.setBackground(new Color(65,125,128));
         b2.setForeground(Color.WHITE);
         b2.setBounds(705,274,150,35);
         b2.addActionListener(this);
         l3.add(b2);
 
-        b3 = new JButton("FAST CASH");
+        b3 = new JButton("Rs. 1000");
         b3.setBackground(new Color(65,125,128));
         b3.setForeground(Color.WHITE);
         b3.setBounds(405,318,150,35);
         b3.addActionListener(this);
         l3.add(b3);
 
-        b4 = new JButton("MINI STATEMENT");
+        b4 = new JButton("Rs. 2000");
         b4.setBackground(new Color(65,125,128));
         b4.setForeground(Color.WHITE);
         b4.setBounds(705,318,150,35);
         b4.addActionListener(this);
         l3.add(b4);
 
-        b5 = new JButton("CHANGE PIN");
+        b5 = new JButton("Rs. 5000");
         b5.setBackground(new Color(65,125,128));
         b5.setForeground(Color.WHITE);
         b5.setBounds(405,362,150,35);
         b5.addActionListener(this);
         l3.add(b5);
 
-        b6 = new JButton("BALANCE ENQUIRY");
+        b6 = new JButton("Rs. 10000");
         b6.setBackground(new Color(65,125,128));
         b6.setForeground(Color.WHITE);
         b6.setBounds(705,362,150,35);
         b6.addActionListener(this);
         l3.add(b6);
 
-        b7 = new JButton("EXIT");
+        b7 = new JButton("BACK");
         b7.setBackground(new Color(65,125,128));
         b7.setForeground(Color.WHITE);
         b7.setBounds(705,406,150,35);
@@ -76,37 +77,44 @@ public class mainClass extends JFrame implements ActionListener{
         setLocation(0,0);
         setLayout(null);
         setVisible(true);
-
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
-            if(e.getSource()==b1){
-                new Deposite(pin);
-                setVisible(false);
-            }else if(e.getSource()==b7){
-                System.exit(0);
-            }else if(e.getSource()==b2){
-                new withdrawl(pin);
-                setVisible(false);
-            }else if(e.getSource()==b3){
-                new FastCash(pin);
-                setVisible(false);
-            }else if(e.getSource()==b4){
-
-            }else if(e.getSource()==b5){
-
-            }else if(e.getSource()==b6){
-                new BalanceEnquiry(pin);
-                setVisible(false);
-            }
+        if(e.getSource()==b7){
+            setVisible(false);
+            new mainClass(pin);
             
-        } catch (Exception E) {
-            E.printStackTrace();
+        }else{
+            String amount =((JButton)e.getSource()).getText().substring(4);
+            Conn c= new Conn();
+            Date date = new Date();
+            try {
+                ResultSet resultSet = c.statement.executeQuery("select * from bank where pin ='"+pin+"'");
+                int balance =0;
+                while(resultSet.next()){
+                    if(resultSet.getString("type").equals("Deposite")){
+                    balance += Integer.parseInt(resultSet.getString("amount"));
+                    }else{
+                        balance -= Integer.parseInt(resultSet.getString("amount"));
+                    }
+                }
+                if(e.getSource()!=b7 && balance < Integer.parseInt(amount)){
+                    JOptionPane.showMessageDialog(null,"Insufficient Balance");
+                    return ;
+                }
+                c.statement.executeUpdate("insert into bank values ('"+pin+"','"+date+"','withdrawl','"+amount+"')");
+                JOptionPane.showMessageDialog(null,"Rs."+amount+" Debited successfully");
+
+            } catch (Exception E) {
+                E.printStackTrace();
+            }
+            setVisible(false);
+            new mainClass(pin);
         }
+        
     }
     public static void main(String[] args) {
-        new mainClass("");
+      new FastCash("");  
     }
     
 }
